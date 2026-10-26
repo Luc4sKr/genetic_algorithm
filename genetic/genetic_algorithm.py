@@ -3,12 +3,12 @@ from genetic.operators.swap_mutation import SwapMutation
 from genetic.operators.crossover_pmx import CrossoverPMX
 from genetic.population import Population
 from genetic.selection.selection_strategy import SelectionStrategy
-from problem.tsp import TSP
+from problem.problem import Problem
 
 class GA:
     def __init__(
         self, 
-        problem: TSP, 
+        problem: Problem, 
         population_size: int, 
         generation_size: int,
         elite_size: int,

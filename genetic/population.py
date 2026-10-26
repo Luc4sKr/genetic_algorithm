@@ -30,7 +30,7 @@ class Population:
         best_cost = float("inf")
         
         for individual in self.__individuals:
-            cost = problem.calculate_tour_distance(individual.chromosome)
+            cost = problem.evaluate(individual.chromosome)
             individual.cost = cost
             if cost < best_cost:
                 best_cost = cost
