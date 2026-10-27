@@ -1,8 +1,10 @@
 from genetic.individual import Individual
+from genetic.operators.cycle_crossover import CycleCrossover
 from genetic.operators.swap_mutation import SwapMutation
 from genetic.operators.crossover_pmx import CrossoverPMX
 from genetic.population import Population
-from genetic.selection.selection_strategy import SelectionStrategy
+from genetic.selection.selection import Selection
+from genetic.stagnation_criteria import StagnationCriteria
 from problem.problem import Problem
 
 class GA:
@@ -12,13 +14,15 @@ class GA:
         population_size: int, 
         generation_size: int,
         elite_size: int,
-        selection: SelectionStrategy
+        selection: Selection,
+        stagnation_criteria: StagnationCriteria
     ):
         self.problem = problem
         self.population_size = population_size
         self.generation_size = generation_size
         self.elite_size = elite_size
         self.selection = selection
+        self.stagnation_criteria = stagnation_criteria
         
         chromosome_length = len(problem.cities)
         self.population = Population(
@@ -27,7 +31,7 @@ class GA:
         )
         
         self.mutation = SwapMutation()
-        self.crossover = CrossoverPMX()
+        self.crossover = CycleCrossover()
         
         self.best_individual = None
     
@@ -60,26 +64,29 @@ class GA:
             parent1 = self.selection.select(self.population)
             parent2 = self.selection.select(self.population)
             
-            # 1) recombine parents
-            child1, child2 = self.crossover.execute(parent1.chromosome, parent2.chromosome)
+            child1, child2 = self.crossover.execute(parent1, parent2)
             
-            # 2) mutate the offspring
-            child1, child2 = self.mutation.mutate(child1, child2)
-            
-            new_population.add_individual(Individual(child1))
+            new_population.add_individual(child1)
             if len(new_population.individuals) < self.population_size:
-                new_population.add_individual(Individual(child2))
+                new_population.add_individual(child2)
             
+        for individual in new_population.individuals:
+            self.mutation.mutate(individual)
+        
         self.population = new_population
         
     def run(self) -> list[int]:
         self.initialize()
+        self.evaluate()
         
         for generation in range(self.generation_size):
-           self.evaluate()
-           self.next_generation()
-           
-        self.evaluate()
+            should_stop = self.stagnation_criteria.verify(self.best_individual.cost)
+            if should_stop:
+                print(f"Stopping at generation {generation} due to stagnation.")
+                break
+            
+            self.next_generation()
+            self.evaluate()
         
         return self.best_individual.chromosome.copy()
         

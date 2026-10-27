@@ -1,6 +1,8 @@
 from scipy.io import loadmat
 
+from genetic.selection.roulette_selection import RouletteSelection
 from genetic.selection.tournament_selection import TournamentSelection
+from genetic.stagnation_criteria import StagnationCriteria
 from models.city import City
 from problem.tsp import TSP
 from genetic.genetic_algorithm import GA
@@ -25,10 +27,11 @@ if __name__ == "__main__":
     
     ga = GA(
         problem=tsp, 
-        population_size=1000, 
-        generation_size=1000,
+        population_size=20, 
+        generation_size=10_000,
         elite_size=5,
-        selection=TournamentSelection(tournament_size=3)
+        selection=RouletteSelection(),
+        stagnation_criteria=StagnationCriteria(stagnation_limit=100)
     )
     
     best = ga.run()

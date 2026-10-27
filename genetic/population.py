@@ -1,6 +1,6 @@
 import random
 
-from problem.tsp import TSP
+from problem.problem import Problem
 from genetic.individual import Individual
         
 class Population:
@@ -24,8 +24,12 @@ class Population:
             chromosome = random.sample(range(self.chromosome_length), self.chromosome_length)
             individual = Individual(chromosome)
             self.add_individual(individual)
+            
+    def generate_k_nearest_neighbor_population(self, problem: Problem, K: int):
         
-    def evaluate(self, problem: TSP) -> Individual:
+        pass
+
+    def evaluate(self, problem: Problem) -> Individual:
         best = None
         best_cost = float("inf")
         
