@@ -29,7 +29,7 @@ if __name__ == "__main__":
         problem=tsp, 
         population_size=20, 
         generation_size=10_000,
-        elite_size=5,
+        elite_size=10,
         selection=RouletteSelection(),
         stagnation_criteria=StagnationCriteria(stagnation_limit=100)
     )

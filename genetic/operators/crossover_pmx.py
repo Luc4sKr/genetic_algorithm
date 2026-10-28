@@ -1,11 +1,13 @@
 import random
 
+from genetic.individual import Individual
+
 class CrossoverPMX:
     def execute(
         self, 
-        parent1: list[int], 
-        parent2: list[int]
-    ) -> tuple[list[int], list[int]]:
+        parent1: Individual, 
+        parent2: Individual
+    ) -> tuple[Individual, Individual]:
         self._validate_parents(parent1, parent2)
         
         size = len(parent1)
@@ -30,48 +32,48 @@ class CrossoverPMX:
     
     @staticmethod
     def _validate_parents(
-        parent1: list[int],
-        parent2: list[int],
+        parent1: Individual,
+        parent2: Individual,
     ) -> None:
-        if len(parent1) != len(parent2):
+        if len(parent1.chromosome) != len(parent2.chromosome):
             raise ValueError(
                 "Os pais devem ter o mesmo tamanho."
             )
 
-        if len(parent1) < 2:
+        if len(parent1.chromosome) < 2:
             raise ValueError(
                 "Os pais devem ter pelo menos dois genes."
             )
 
-        if len(set(parent1)) != len(parent1):
+        if len(set(parent1.chromosome)) != len(parent1.chromosome):
             raise ValueError(
                 "O primeiro pai possui genes duplicados."
             )
 
-        if len(set(parent2)) != len(parent2):
+        if len(set(parent2.chromosome)) != len(parent2.chromosome):
             raise ValueError(
                 "O segundo pai possui genes duplicados."
             )
 
-        if set(parent1) != set(parent2):
+        if set(parent1.chromosome) != set(parent2.chromosome):
             raise ValueError(
                 "Os pais devem conter os mesmos genes."
             )
     
     def _create_child(
         self,
-        parent1: list[int],
-        parent2: list[int],
+        parent1: Individual,
+        parent2: Individual,
         start: int,
         end: int,
-    ) -> list[int]:
-        size = len(parent1)
+    ) -> Individual:
+        size = len(parent1.chromosome)
         child = [None] * size
 
-        child[start:end + 1] = parent1[start:end + 1]
+        child[start:end + 1] = parent1.chromosome[start:end + 1]
 
         for i in range(start, end + 1):
-            gene = parent2[i]
+            gene = parent2.chromosome[i]
 
             if gene in child:
                 continue
@@ -79,13 +81,13 @@ class CrossoverPMX:
             position = i
 
             while start <= position <= end:
-                mapped_gene = parent1[position]
-                position = parent2.index(mapped_gene)
+                mapped_gene = parent1.chromosome[position]
+                position = parent2.chromosome.index(mapped_gene)
 
             child[position] = gene
 
         for i in range(size):
             if child[i] is None:
-                child[i] = parent2[i]
+                child[i] = parent2.chromosome[i]
 
-        return child
+        return Individual(chromosome=child)
