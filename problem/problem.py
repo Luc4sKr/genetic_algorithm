@@ -15,9 +15,6 @@ class Problem:
         diff = coords[:, np.newaxis, :] - coords[np.newaxis, :, :]
         self._distance_matrix = np.sqrt(np.einsum("ijk,ijk->ij", diff, diff))
 
-        # versão em listas Python aninhadas: indexar matrix[i][j] em loops Python
-        # (avaliação de rota, 2-opt) evita o overhead de recriar arrays numpy a
-        # cada chamada, que domina quando a avaliação é feita rota por rota.
         self._matrix = self._distance_matrix.tolist()
     
     @property

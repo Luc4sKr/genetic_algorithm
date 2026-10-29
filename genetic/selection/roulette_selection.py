@@ -7,7 +7,7 @@ from genetic.selection.selection import Selection
 
 class RouletteSelection(Selection):
     def select(self, population: Population) -> Individual:
-        '''Seleciona um indivíduo dando maior probabilidade a custos menores.'''
+        """Seleciona um indivíduo dando maior probabilidade a custos menores."""
         
         weights = [1.0 / individual.cost for individual in population.individuals]
         total_weight = sum(weights)

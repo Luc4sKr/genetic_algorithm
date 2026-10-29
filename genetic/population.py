@@ -24,10 +24,6 @@ class Population:
             chromosome = random.sample(range(self.chromosome_length), self.chromosome_length)
             individual = Individual(chromosome)
             self.add_individual(individual)
-            
-    def generate_k_nearest_neighbor_population(self, problem: Problem, K: int):
-        
-        pass
 
     def evaluate(self, problem: Problem) -> Individual:
         best = None
