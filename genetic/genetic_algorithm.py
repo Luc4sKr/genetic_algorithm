@@ -74,6 +74,13 @@ class GA:
             
         self.population = new_population
         
+    def print_results(self):
+        print(f"population size: {self.population_size}")
+        print(f"generation size: {self.generation_size}")
+        print(f"cities: {len(self.problem.cities)}")
+        print(f"best cost: {self.best_individual.cost}")
+        print(f"best route: {self.best_individual.chromosome}")
+        
     def run(self) -> list[int]:
         self.initialize()
         self.evaluate()
@@ -87,6 +94,7 @@ class GA:
             self.next_generation()
             self.evaluate()
         
+        self.print_results()
         return self.best_individual.chromosome.copy()
         
         

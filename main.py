@@ -1,27 +1,13 @@
-from scipy.io import loadmat
-
 from genetic.selection.roulette_selection import RouletteSelection
-from genetic.selection.tournament_selection import TournamentSelection
 from genetic.stagnation_criteria import StagnationCriteria
+from loaders.cities_loader import CityLoader
 from models.city import City
 from problem.tsp import TSP
 from genetic.genetic_algorithm import GA
 from visualization.plot import plot_route
 
-
-def load_cities() -> list[City]:
-    data = loadmat("data/cities.mat")
-
-    x = data["x"].flatten()
-    y = data["y"].flatten()
-
-    return [
-        City(float(xi), float(yi))
-        for xi, yi in zip(x, y)
-    ]
-        
 if __name__ == "__main__":
-    cities = load_cities()
+    cities = CityLoader.load("data/cities.mat")
     
     tsp = TSP(cities)
     
@@ -31,7 +17,7 @@ if __name__ == "__main__":
         generation_size=10_000,
         elite_size=10,
         selection=RouletteSelection(),
-        stagnation_criteria=StagnationCriteria(stagnation_limit=100)
+        stagnation_criteria=StagnationCriteria(stagnation_limit=1000)
     )
     
     best = ga.run()
