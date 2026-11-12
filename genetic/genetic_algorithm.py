@@ -66,8 +66,8 @@ class GA:
             
             child1, child2 = self.crossover.execute(parent1, parent2)
             
-            new_population.add_individual(child1)
             self.mutation.mutate(child1)
+            new_population.add_individual(child1)
             if len(new_population.individuals) < self.population_size:
                 self.mutation.mutate(child2)
                 new_population.add_individual(child2)
