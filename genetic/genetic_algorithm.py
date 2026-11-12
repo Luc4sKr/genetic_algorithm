@@ -1,9 +1,6 @@
-import random
-
 from genetic.individual import Individual
 from genetic.operators.cycle_crossover import CycleCrossover
 from genetic.operators.swap_mutation import SwapMutation
-from genetic.operators.crossover_pmx import CrossoverPMX
 from genetic.population import Population
 from genetic.selection.selection import Selection
 from genetic.stagnation_criteria import StagnationCriteria
@@ -22,10 +19,10 @@ class GA:
         self.problem = problem
         self.population_size = population_size
         self.generation_size = generation_size
-        
+
         if not 1 <= survivor_size < population_size:
             raise ValueError("Survivor size must be between 1 and population size - 1.")
-        
+
         self.survivor_size = survivor_size
         self.selection = selection
         self.stagnation_criteria = stagnation_criteria
@@ -53,22 +50,15 @@ class GA:
             or generation_best.cost < self.best_individual.cost
         ):
             # Guarda uma cópia para preservar o melhor resultado da busca.
-            snapshot = Individual(generation_best.chromosome.copy())
-            snapshot.cost = generation_best.cost
-            self.best_individual = snapshot
+            self.best_individual = generation_best.copy()
             print(f"New best individual found: {self.best_individual.cost}")
 
     def select_survivors(self) -> Population:
-        candidates = Population(self.population_size, self.population.chromosome_length)
-        for individual in self.population.individuals:
-            candidates.add_individual(individual)
-
+        self.population.sort_by_cost()
         survivors = Population(self.survivor_size, self.population.chromosome_length)
-        # A roleta escolhe os sobreviventes sem selecionar o mesmo indivíduo duas vezes.
-        for _ in range(self.survivor_size):
-            selected = self.selection.select(candidates)
-            survivors.add_individual(selected.copy())
-            candidates.individuals.remove(selected)
+        # Preserva os melhores sem mutação para não perder as soluções já encontradas.
+        for individual in self.population.individuals[:self.survivor_size]:
+            survivors.add_individual(individual.copy())
         return survivors
 
     def next_generation(self):
@@ -79,9 +69,9 @@ class GA:
             new_population.add_individual(individual.copy())
 
         while len(new_population.individuals) < self.population_size:
-            # Apenas os sobreviventes participam da reprodução.
-            parent1 = random.choice(survivors.individuals)
-            parent2 = random.choice(survivors.individuals)
+            # A roleta favorece os menores custos e permite reproduzir toda a população.
+            parent1 = self.selection.select(self.population)
+            parent2 = self.selection.select(self.population)
 
             child1, child2 = self.crossover.execute(parent1, parent2)
 
@@ -109,6 +99,7 @@ class GA:
     def run(self) -> list[int]:
         self.initialize()
         self.evaluate()
+
         # Preserva a população inicial, com seus custos, para a exibição final.
         self.initial_population = [individual.copy() for individual in self.population.individuals]
 

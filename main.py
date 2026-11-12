@@ -14,7 +14,7 @@ if __name__ == "__main__":
         problem=tsp,
         population_size=20,
         generation_size=10_000,
-        survivor_size=10,
+        survivor_size=10,  # Mantém os dez melhores; a roleta seleciona os pais.
         selection=RouletteSelection(),
         stagnation_criteria=StagnationCriteria(stagnation_limit=1000)
     )
