@@ -27,18 +27,12 @@ class Population:
             self.add_individual(individual)
 
     def evaluate(self, problem: Problem) -> Individual:
-        # Calcula os custos e identifica a menor distância da geração.
-        best = None
-        best_cost = float("inf")
-
+        # Avalia toda a população antes de ordenar pelo menor custo.
         for individual in self.__individuals:
-            cost = problem.evaluate(individual.chromosome)
-            individual.cost = cost
-            if cost < best_cost:
-                best_cost = cost
-                best = individual
+            individual.cost = problem.evaluate(individual.chromosome)
 
-        return best
+        self.sort_by_cost()
+        return self.__individuals[0]
 
     def sort_by_cost(self):
         self.__individuals.sort(key=lambda ind: ind.cost)

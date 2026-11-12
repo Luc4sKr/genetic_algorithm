@@ -36,25 +36,15 @@ class GA:
         self.mutation = SwapMutation()
         self.crossover = CycleCrossover()
 
-        self.best_individual = None
         self.initial_population: list[Individual] = []
 
     def initialize(self):
         self.population.generate_random_population()
 
-    def evaluate(self):
-        generation_best = self.population.evaluate(self.problem)
-
-        if (
-            self.best_individual is None
-            or generation_best.cost < self.best_individual.cost
-        ):
-            # Guarda uma cópia para preservar o melhor resultado da busca.
-            self.best_individual = generation_best.copy()
-            print(f"New best individual found: {self.best_individual.cost}")
+    def evaluate(self) -> Individual:
+        return self.population.evaluate(self.problem)
 
     def select_survivors(self) -> Population:
-        self.population.sort_by_cost()
         survivors = Population(self.survivor_size, self.population.chromosome_length)
         # Preserva os melhores sem mutação para não perder as soluções já encontradas.
         for individual in self.population.individuals[:self.survivor_size]:
@@ -83,7 +73,7 @@ class GA:
 
         self.population = new_population
 
-    def print_results(self):
+    def print_results(self, best: Individual):
         print(f"population size: {self.population_size}")
         print("initial population:")
         for index, individual in enumerate(self.initial_population, start=1):
@@ -93,24 +83,28 @@ class GA:
             print(f"  {index}: {individual.chromosome} | cost: {individual.cost}")
         print(f"generation size: {self.generation_size}")
         print(f"cities: {len(self.problem.cities)}")
-        print(f"best cost: {self.best_individual.cost}")
-        print(f"best route: {self.best_individual.chromosome}")
+        print(f"best cost: {best.cost}")
+        print(f"best route: {best.chromosome}")
 
     def run(self) -> list[int]:
         self.initialize()
-        self.evaluate()
+        best = self.evaluate()
+        print(f"New best individual found: {best.cost}")
 
         # Preserva a população inicial, com seus custos, para a exibição final.
         self.initial_population = [individual.copy() for individual in self.population.individuals]
 
         for generation in range(self.generation_size):
-            should_stop = self.stagnation_criteria.verify(self.best_individual.cost)
+            should_stop = self.stagnation_criteria.verify(best.cost)
             if should_stop:
                 print(f"Stopping at generation {generation} due to stagnation.")
                 break
 
             self.next_generation()
-            self.evaluate()
+            previous_cost = best.cost
+            best = self.evaluate()
+            if best.cost < previous_cost:
+                print(f"New best individual found: {best.cost}")
 
-        self.print_results()
-        return self.best_individual.chromosome.copy()
+        self.print_results(best)
+        return best.chromosome.copy()
